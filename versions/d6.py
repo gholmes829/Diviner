@@ -23,15 +23,6 @@ class DivinerD6(diviner.DivinerBase):
     def __init__(self, compiler_path: str, test_dir_path: str, force_query: bool = False) -> None:
         super().__init__(6, compiler_path, test_dir_path, force_query = force_query)
 
-    def get_actual_output(self, test_i: int, test_name: str, test_path: str) -> str:
-        raise NotImplementedError
-        # return self.run_compiler(test_path, '-c')
-    
-    def compare_outputs(self, true_output: str, actual_output: str) -> bool:
-        """Determines if outputs should be considered equal"""
-        raise NotImplementedError
-        #return true_output == actual_output
-
 
 def make_D6_subparser(subparsers) -> argparse.Namespace:
     """Defines and parses cmd line args."""
@@ -50,6 +41,8 @@ def make_D6_subparser(subparsers) -> argparse.Namespace:
         help='if 1 (not default), will skip test.cshanty if test.oracle file already present; setting to 0 \
                 will query the oracle regardless and overwrite existing test.truth files'
     )
+    
+    parser.set_defaults(func = main)
     
     return parser  
 

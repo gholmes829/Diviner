@@ -53,6 +53,7 @@ def make_D5_subparser(subparsers) -> argparse.Namespace:
         help='if 1 (not default), will skip test.cshanty if test.oracle file already present; setting to 0 \
                 will query the oracle regardless and overwrite existing test.truth files'
     )
+    parser.set_defaults(func = main)
     
     return parser  
 

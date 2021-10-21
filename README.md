@@ -4,7 +4,7 @@ A complement to The Oracle for compilers class. Given some test cases, this prog
 More spefically this program:
 * Runs your *\*.cshanty* test inputs thru the oracle & collects its response to give a "true output"; writes *\*.truth* to test dir.
 * Runs all your test inputs through your compiled compiler & collects outputs to give an "actual output"; writes *\*.actual* to test dir.
-* For each *(\*.truth, \*.actual)* pair, essentially runs a more nuanced version of diff to check if your comiler is producing correct output; provides score and details.       
+* For each *(\*.truth, \*.actual)* pair, essentially runs a more nuanced version of diff to check if your compiler is producing correct output; provides score and details.       
 
 ## Formal Usage:
 * `python3 diviner.py <diviner version> <path to cshantyc> <path to dir containing *.cshantyc test cases> <-l, optional>`
