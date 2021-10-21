@@ -13,7 +13,6 @@ __modified__ = '10/21/2021'
 
 def main():
 	args = argparser.parse_args()
-	print(args)
 	args.func(args)
 
 if __name__ == '__main__':
