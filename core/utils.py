@@ -81,6 +81,7 @@ class TestManager(metaclass=abc.ABCMeta):
             return 1  # success
 
     def run_tests(self) -> None:
+        """Use multithreading to run all tests then display results."""
         self.print_pre_info()
         passed_map = {False: [], True: []}
         params = list(zip(*reduce(lambda b, a: b + [a], self.get_test_cb_args(), self.test_data)))

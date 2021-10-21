@@ -24,7 +24,7 @@ class DivinerD6(diviner.DivinerBase):
         super().__init__(6, compiler_path, test_dir_path, force_query = force_query)
 
 
-def make_D6_subparser(subparsers) -> argparse.Namespace:
+def make_subparser(subparsers) -> argparse.Namespace:
     """Defines and parses cmd line args."""
     parser = subparsers.add_parser('d6')
 
@@ -62,6 +62,7 @@ def main(args) -> None:
         print(diviner.title() + '\n')
         diviner.run_tests()
     
+    print(f'Program took {round(t.elapsed, 2)} secs to complete.\n')
 
 if __name__ == '__main__':
     main()

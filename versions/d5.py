@@ -36,7 +36,7 @@ class DivinerD5(diviner.DivinerBase):
         return actual_count == truth_count
 
 
-def make_D5_subparser(subparsers) -> argparse.Namespace:
+def make_subparser(subparsers) -> argparse.Namespace:
     """Defines and parses cmd line args."""
     parser = subparsers.add_parser('d5')
 
@@ -72,6 +72,8 @@ def main(args) -> None:
         diviner = DivinerD5(compiler_path, test_dir_path, force_query = not args.lazy_query)
         print(diviner.title() + '\n')
         diviner.run_tests()
+    
+    print(f'Program took {round(t.elapsed, 2)} secs to complete.\n')
     
 
 if __name__ == '__main__':
