@@ -4,7 +4,7 @@ A complement to The Oracle for compilers class. Given some test cases, this prog
 More spefically this program:
 * Runs your *\*.cshanty* test inputs thru the oracle & collects its response to give a "true output"; writes *\*.truth* to test dir.
 * Runs all your test inputs through your compiled compiler & collects outputs to give an "actual output"; writes *\*.actual* to test dir.
-* For each *(\*.oracle, \*.actual)* pair, essentially runs a more nuanced version of diff to check if your comiler is producing correct output; provides score and details.       
+* For each *(\*.truth, \*.actual)* pair, essentially runs a more nuanced version of diff to check if your comiler is producing correct output; provides score and details.       
 
 ## Formal Usage:
 * `python3 diviner.py <path to cshantyc> <path to dir containing *.cshantyc test cases> <-l, optional>`
@@ -29,5 +29,5 @@ More spefically this program:
     
     
 ## Notes:
-* For a given *.cshanty, if this program already detects a *.oracle it will still requery the oracle for that test. Setting `--lazy-query=1` in cmd line args will instead skip it to avoid excess time and requests.
+* For a given *.cshanty, if this program already detects a *.truth it will still requery the oracle for that test. Setting `--lazy-query=1` in cmd line args will instead skip it to avoid excess time and requests.
 * Currently, only type analysis version for P5 is developed. However, feel free to fork and add new version `d[1-8]` in `versions/`. If you inherit from `core/diviner.py/DivinerBase` it should be very trivial to do other versions. 
