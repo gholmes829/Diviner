@@ -7,14 +7,16 @@ More spefically this program:
 * For each *(\*.truth, \*.actual)* pair, essentially runs a more nuanced version of diff to check if your comiler is producing correct output; provides score and details.       
 
 ## Formal Usage:
-* `python3 diviner.py <path to cshantyc> <path to dir containing *.cshantyc test cases> <-l, optional>`
+* `python3 diviner.py <diviner version> <path to cshantyc> <path to dir containing *.cshantyc test cases> <-l, optional>`
 * `python3 diviner.py --help`
+* `python3 diviner.py d5 -h`
 
 ## Example usage:
-* `python3 diviner cshantyc my_tests/`
-* `python3 diviner cshantyc my_tests/ --lazy-query`
-* `python3 diviner cshantyc my_tests/ -l`
-* `python3 diviner --help`
+* `python3 diviner d5 cshantyc my_tests/`
+* `python3 diviner d5 cshantyc my_tests/ --lazy-query`
+* `python3 diviner d5 cshantyc my_tests/ -l`
+* `python3 diviner d6 --help`
+* `python3 diviner d6 -h`
     
 ...where `my_tests/` might contain test1.cshanty, test2.cshanty, etc.
     
@@ -24,10 +26,10 @@ More spefically this program:
 * tqdm `pip3 install tqdm`
 * ...the rest should be standard.
 
-* You can also run `make install` or `pip3 install -r requirements.txt` for convenience
+* You can also (alternatively) run `make install` or `pip3 install -r requirements.txt` for convenience
 * While we are on the topic of make directives, `make clean` removes all compiled `*.pyc` files
     
     
 ## Notes:
 * For a given *.cshanty, if this program already detects a *.truth it will still requery the oracle for that test. Setting `--lazy-query=1` in cmd line args will instead skip it to avoid excess time and requests.
-* Currently, only type analysis version for P5 is developed. However, feel free to fork and add new version `d[1-8]` in `versions/`. If you inherit from `core/diviner.py/DivinerBase` it should be very trivial to do other versions. 
+* Currently, only type analysis version for P5 is developed (diviner version = d5). However, feel free to fork and add new version `d[1-8]` in `versions/`. If you inherit from `core/diviner.py/DivinerBase` it should be very trivial to do other versions. 
