@@ -3,7 +3,7 @@ Given some test cases, this program automatically queries the oracle and tests y
 
 More spefically this program:
     1) Runs your test inputs thru the oracle & collects its response
-        to give a "true output"; writes "<\test>.oracle" to test dir.
+        to give a "true output"; writes "<test>.oracle" to test dir.
         
     2) Runs all your test inputs through your compiled compiler & collects
         outputs to give an "actual output"; writes <test>.actual to test dir.
@@ -12,7 +12,7 @@ More spefically this program:
         your comiler is producing correct output; provides score and details.       
 
 ## Formal Usage:
-    `python3 diviner.py <\path to cshantyc> <\path to dir containing *.cshantyc test cases> <-f, optional>`
+    `python3 diviner.py <path to cshantyc> <path to dir containing *.cshantyc test cases> <-f, optional>`
     `python3 diviner.py --help`
 
 ## Example usage:
