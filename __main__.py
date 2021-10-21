@@ -3,7 +3,7 @@
 """
 
 import versions
-import settings
+from versions import argparser
 
 
 __author__ = 'Grant Holmes'
@@ -17,8 +17,8 @@ diviner_versions = {
 }
 
 def main():
-	selected_version = settings.VERSION
-	diviner_versions[selected_version]()
+	args = argparser.parse_args()
+	diviner_versions[args.version](args)
 
 if __name__ == '__main__':
 	main()

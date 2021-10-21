@@ -36,9 +36,10 @@ class DivinerD5(diviner.DivinerBase):
         return actual_count == truth_count
 
 
-def parse_args() -> argparse.Namespace:
+def make_D5_subparser(subparsers) -> argparse.Namespace:
     """Defines and parses cmd line args."""
-    parser = argparse.ArgumentParser(description='Consult the oracle and run automated tests with ease.')
+    parser = subparsers.add_parser('d5')
+
     parser.add_argument('compiler_path', help='relative path to "cshantyc" executable')
     parser.add_argument('test_dir_path', help='relative path to dir containing "*.cshanty" tests')
     parser.add_argument(
@@ -52,14 +53,13 @@ def parse_args() -> argparse.Namespace:
         help='if 1 (not default), will skip test.cshanty if test.oracle file already present; setting to 0 \
                 will query the oracle regardless and overwrite existing test.truth files'
     )
-    return parser.parse_args()    
+    
+    return parser  
 
 
-def main() -> None:
+def main(args) -> None:
     """Validates inputs then runs main functions."""
     with utils.Timer() as t:
-        args = parse_args()
-        
         compiler_path = osp.join(os.getcwd(), args.compiler_path)
         if not osp.isfile(compiler_path):
             utils.fatal_error(f'Provided path is not a valid compiler: "{compiler_path}"')
