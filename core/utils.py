@@ -22,57 +22,60 @@ class TestManager(metaclass=abc.ABCMeta):
     """
     Abstracted test manager. Must implement required abstract methods for particular use case.
     """
-    def __init__(self, test_dir_path, test_ext) -> None:
+    def __init__(self, test_dir_path: str, test_ext: str, force_query: str = False) -> None:
         self.test_dir_path = test_dir_path
         self.test_ext = test_ext
-        
         self.test_file_names = [f for f in os.listdir(test_dir_path) if f.split('.')[-1] == test_ext]
         self.n_tests = len(self.test_file_names)
-        
-        if not self.n_tests:
-            fatal_error(f'no "*.{test_ext}" test cases found in "{test_dir_path}".')
-            
+        if not self.n_tests: fatal_error(f'no "*.{test_ext}" test cases found in "{test_dir_path}".')
         self.test_file_paths = [osp.join(test_dir_path, f_name) for f_name in self.test_file_names]
-
         self.test_data = [range(self.n_tests), self.test_file_names, self.test_file_paths]
-        
         self.actual_outputs = None
         self.true_outputs = None
-        
+        self.force_query = force_query
         self.pbar = None
 
     @abc.abstractmethod
     def compare_outputs(self, true_output: str, actual_output: str, *args) -> bool:
+        """Compare true and actual output to determine if they match."""
         raise NotImplementedError
     
     @abc.abstractmethod
     def get_actual_output(self, test_i: int, test_name: str, test_path: str, *args) -> str:
+        """Get the real output that will be compared to the expected output."""
         raise NotImplementedError
     
     @abc.abstractmethod
     def get_true_output(self, test_i: int, test_name: str, test_path: str, *args) -> str:
+        """Get the true or expected output."""
         raise NotImplementedError
     
-    @abc.abstractmethod
     def get_test_cb_args(self) -> list:
-        raise NotImplementedError
+        """Extra args passed to get_actual_output and get_true_output."""
+        return []
     
-    def run_test(self, passed_map, test_i, test_name, test_path):
-        true_ouput = self.get_true_output(test_i, test_name, test_path)
-        actual_output = self.get_actual_output(test_i, test_name, test_path)
+    def run_test(self, passed_map: dict, test_i: int, test_name: str, test_path: str, write_to_file: bool = True) -> int:
+        """Gets the actual and true output, compares them, and writes to files."""
+        base = test_name.split(".")[0]
+        truth_path = osp.join(self.test_dir_path, f'{base}.truth')
+        actual_path = osp.join(self.test_dir_path, f'{base}.actual')
         
-        if true_ouput is None or actual_output is None:
+        queried_truth = False
+        if not osp.isfile(test_path) or self.force_query:
+            true_output = self.get_true_output(test_i, test_name, test_path)
+            queried_truth = True
+        else:
+            true_output = ''
+        actual_output = self.get_actual_output(test_i, test_name, test_path)
+        if true_output is None or actual_output is None:
             return 0  # failed
         else:
-            base = test_name.split(".")[0]
-            truth_path = osp.join(self.test_dir_path, f'{base}.truth')
-            actual_path = osp.join(self.test_dir_path, f'{base}.actual')
-            
-            with open(actual_path, 'w') as f1, open(truth_path, 'w') as f2:
-                f1.write(actual_output)
-                f2.write(true_ouput)
+            with open(actual_path, 'w') as f1, open(truth_path, 'w' if queried_truth else 'r') as f2:
+                if write_to_file: f1.write(actual_output)
+                if queried_truth and write_to_file: f2.write(true_output)
+                elif not queried_truth: true_output = f2.read()
                 
-            passed = self.compare_outputs(true_ouput, actual_output)
+            passed = self.compare_outputs(true_output, actual_output)
             passed_map[passed].append(test_name)
             self.pbar.update(1)
             return 1  # success
@@ -84,9 +87,9 @@ class TestManager(metaclass=abc.ABCMeta):
         with Timer() as t, tqdm(total=self.n_tests, ascii=True) as self.pbar:
             exit_codes = threaded_map(lambda params: self.run_test(passed_map, *params), params)
 
-        try:
-            _ = list(exit_codes)
-        except Exception:
+        try: _ = list(exit_codes)  # this essentially "gets" the async results which may raise error
+        except Exception as e:
+            raise e
             self.pbar.close()
             fatal_error('exception occurred while evaluating tests.')
         else:
@@ -163,6 +166,11 @@ def retryable(
         return decorator(f)
     else:
         return decorator
+    
+    
+def count(data: Iterable) -> dict:
+    """Counts number of occurrences for each item in list."""
+    return {el: list(data).count(el) for el in set(data)}
     
     
 def warning(msg: str) -> None:

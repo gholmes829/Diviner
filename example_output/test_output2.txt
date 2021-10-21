@@ -1,0 +1,66 @@
++==================+
+| THE DIVINER (P5) |
++==================+
+
+Consulting with The Oracle at "https://compilers.cool/oracles/o5/" and evaluating on local compiler...
+
+The following tests PASSED:
+	- callNonFn.cshanty
+	- empty.cshanty
+	- excessArgs.cshanty
+	- fewArgs.cshanty
+	- noReturnInNonVoidFn1.cshanty
+	- noReturnInNonVoidFn2.cshanty
+	- printFn.cshanty
+	- printVoid.cshanty
+	- rand1.cshanty
+	- rand2.cshanty
+	- rand3.cshanty
+	- readFn.cshanty
+	- returnInVoidFn.cshanty
+	- rightAdd.cshanty
+	- rightArgs.cshanty
+	- rightBoolOps.cshanty
+	- rightCall.cshanty
+	- rightIf.cshanty
+	- rightInc.cshanty
+	- rightLogic.cshanty
+	- rightLt.cshanty
+	- rightMultMath.cshanty
+	- rightReturn.cshanty
+	- rightWhile.cshanty
+	- single1.cshanty
+	- wrongAdd.cshanty
+	- wrongArgTypes.cshanty
+	- wrongBoolOps.cshanty
+	- wrongEqOpd1.cshanty
+	- wrongEqOpd2.cshanty
+	- wrongEqOpr1.cshanty
+	- wrongEqOpr2.cshanty
+	- wrongIf.cshanty
+	- wrongInc.cshanty
+	- wrongLogic.cshanty
+	- wrongLt.cshanty
+	- wrongNestedMath.cshanty
+	- wrongRecEq.cshanty
+	- wrongRecRead.cshanty
+	- wrongRecVarEq.cshanty
+	- wrongRecVarRead.cshanty
+	- wrongRetType.cshanty
+	- wrongString.cshanty
+	- wrongWhile.cshanty
+
+The following tests FAILED:
+	- segFault1.cshanty
+	- segFault2.cshanty
+	- segFault3.cshanty
+
+Skipping 0 previously evaluated queries.
+
+
+Wrote *.truth and *.actual files to "/mnt/c/Users/gholm/Desktop/C-Shanty/tests/".
+
+
+Completed 47 test cases in 3.42 secs.
+Score: 44/47 (93.62%)
+

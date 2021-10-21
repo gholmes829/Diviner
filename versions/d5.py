@@ -14,7 +14,6 @@ __modified__ = '10/21/2021'
 import sys
 sys.path.append('..')
 import os.path as osp, os
-import subprocess
 import argparse
 import re
 
@@ -24,29 +23,16 @@ from core import diviner, utils
 class DivinerD5(diviner.DivinerBase):
     def __init__(self, compiler_path: str, test_dir_path: str, force_query: bool = False) -> None:
         super().__init__(5, compiler_path, test_dir_path, force_query = force_query)
-        self.disregard_pattern = re.compile(r' \[[0-9]+,[0-9]+\]\-\[[0-9]+,[0-9]+\]: ')
-
-    def get_test_cb_args(self) -> list:
-        return []
+        self.rm_ptn = re.compile(r' \[[0-9]+,[0-9]+\]\-\[[0-9]+,[0-9]+\]: ')
 
     def get_actual_output(self, test_i: int, test_name: str, test_path: str) -> str:
-        try:
-            return subprocess.run(
-                [f'./{osp.basename(self.compiler_path)}', test_path, '-c'],
-                cwd = osp.dirname(self.compiler_path),
-                stdout = subprocess.PIPE,
-                stderr = subprocess.STDOUT,
-            ).stdout.decode(encoding='utf-8')
-        except Exception as err:
-            utils.fatal_error(f'unable to run compiler "{err.strerror}: {err.filename}".')
+        return self.run_compiler(test_path, '-c')
     
     def compare_outputs(self, true_output: str, actual_output: str) -> bool:
         """Determines if outputs should be considered equal. Note, that we
         are no longer required to match pos or order -- just error type."""
-        actuals = [re.sub(self.disregard_pattern, ' ', ln) for ln in actual_output.split('\n')]
-        truths = [re.sub(self.disregard_pattern, ' ', ln) for ln in true_output.split('\n')]
-        actual_count = {ln: actuals.count(ln) for ln in set(actuals)}
-        truth_count = {ln: truths.count(ln) for ln in set(truths)}
+        actual_count = utils.count(map(lambda ln: re.sub(self.rm_ptn, ' ', ln), actual_output.split('\n')))
+        truth_count = utils.count(map(lambda ln: re.sub(self.rm_ptn, ' ', ln), true_output.split('\n')))
         return actual_count == truth_count
 
 
