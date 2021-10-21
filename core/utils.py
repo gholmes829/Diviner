@@ -88,8 +88,7 @@ class TestManager(metaclass=abc.ABCMeta):
             exit_codes = threaded_map(lambda params: self.run_test(passed_map, *params), params)
 
         try: _ = list(exit_codes)  # this essentially "gets" the async results which may raise error
-        except Exception as e:
-            raise e
+        except Exception:
             self.pbar.close()
             fatal_error('exception occurred while evaluating tests.')
         else:
