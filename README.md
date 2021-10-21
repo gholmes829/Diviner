@@ -1,5 +1,5 @@
-# Diviner
-Given some test cases, this program automatically queries the oracle and tests your compiler!
+# The Diviner
+A complement to The Oracle for compilers class. Given some test cases, this program automatically queries the oracle and tests your compiler!
 
 More spefically this program:
 * Runs your *\*.cshanty* test inputs thru the oracle & collects its response to give a "true output"; writes *\*.truth* to test dir.
@@ -20,12 +20,14 @@ More spefically this program:
     
 ## Dependencies:
 * python3 (https://www.python.org/downloads/)
-* bs4 (pip3 install bs4)
-* tqdm (pip3 install tqdm)
+* bs4 `pip3 install bs4`
+* tqdm `pip3 install tqdm`
 * ...the rest should be standard.
+
 * You can also run `make install` or `pip3 install -r requirements.txt` for convenience
 * While we are on the topic of make directives, `make clean` removes all compiled `*.pyc` files
     
     
 ## Notes:
 * For a given *.cshanty, if this program already detects a *.oracle it will still requery the oracle for that test. Setting `--lazy-query=1` in cmd line args will instead skip it to avoid excess time and requests.
+* Currently, only type analysis version for P5 is developed. However, feel free to fork and add new version `d[1-8]` in `versions/`. If you inherit from `core/diviner.py/DivinerBase` it should be very trivial to do other versions. 
