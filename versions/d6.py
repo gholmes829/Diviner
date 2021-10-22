@@ -19,7 +19,7 @@ import argparse
 from core import diviner, utils
 
 
-class DivinerD6(diviner.DivinerBase):
+class Diviner(diviner.DivinerBase):
     def __init__(self, compiler_path: str, test_dir_path: str, force_query: bool = False) -> None:
         super().__init__(6, compiler_path, test_dir_path, force_query = force_query)
 
@@ -58,7 +58,7 @@ def main(args) -> None:
         if not osp.isdir(test_dir_path):
             utils.fatal_error(f'Provided path is not a valid test dir: "{test_dir_path}"')
 
-        diviner = DivinerD6(compiler_path, test_dir_path, force_query = not args.lazy_query)
+        diviner = Diviner(compiler_path, test_dir_path, force_query = not args.lazy_query)
         print(diviner.title() + '\n')
         diviner.run_tests()
     

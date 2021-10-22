@@ -20,7 +20,7 @@ import re
 from core import diviner, utils
 
 
-class DivinerD5(diviner.DivinerBase):
+class Diviner(diviner.DivinerBase):
     def __init__(self, compiler_path: str, test_dir_path: str, force_query: bool = False) -> None:
         super().__init__(5, compiler_path, test_dir_path, force_query = force_query)
         self.rm_ptn = re.compile(r' \[[0-9]+,[0-9]+\]\-\[[0-9]+,[0-9]+\]: ')
@@ -69,7 +69,7 @@ def main(args) -> None:
         if not osp.isdir(test_dir_path):
             utils.fatal_error(f'Provided path is not a valid test dir: "{test_dir_path}"')
 
-        diviner = DivinerD5(compiler_path, test_dir_path, force_query = not args.lazy_query)
+        diviner = Diviner(compiler_path, test_dir_path, force_query = not args.lazy_query)
         print(diviner.title() + '\n')
         diviner.run_tests()
     
