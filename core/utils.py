@@ -6,7 +6,7 @@ import sys
 import os.path as osp, os
 from typing import Callable, Iterable, Iterator
 import time
-import abc
+from abc import ABCMeta, abstractmethod 
 from tqdm import tqdm
 from functools import wraps, reduce
 from concurrent.futures import ThreadPoolExecutor
@@ -18,34 +18,34 @@ __created__ = '10/19/2021'
 __modified__ = '10/21/2021'
 
 
-class TestManager(metaclass=abc.ABCMeta):
+class TestManager(metaclass=ABCMeta):
     """
     Abstracted test manager. Must implement required abstract methods for particular use case.
     """
-    def __init__(self, test_dir_path: str, test_ext: str, force_query: str = False) -> None:
+    def __init__(self, test_dir_path: str, test_ext: str) -> None:
         self.test_dir_path = test_dir_path
         self.test_ext = test_ext
         self.test_file_names = [f for f in os.listdir(test_dir_path) if f.split('.')[-1] == test_ext]
         self.n_tests = len(self.test_file_names)
-        if not self.n_tests: fatal_error(f'no "*.{test_ext}" test cases found in "{test_dir_path}".')
+        if not self.n_tests:
+            fatal_error(f'no "*.{test_ext}" test cases found in "{test_dir_path}".')
         self.test_file_paths = [osp.join(test_dir_path, f_name) for f_name in self.test_file_names]
         self.test_data = [range(self.n_tests), self.test_file_names, self.test_file_paths]
         self.actual_outputs = None
         self.true_outputs = None
-        self.force_query = force_query
         self.pbar = None
 
-    @abc.abstractmethod
+    @abstractmethod
     def compare_outputs(self, true_output: str, actual_output: str, *args) -> bool:
         """Compare true and actual output to determine if they match."""
         raise NotImplementedError
     
-    @abc.abstractmethod
+    @abstractmethod
     def get_actual_output(self, test_i: int, test_name: str, test_path: str, *args) -> str:
         """Get the real output that will be compared to the expected output."""
         raise NotImplementedError
     
-    @abc.abstractmethod
+    @abstractmethod
     def get_true_output(self, test_i: int, test_name: str, test_path: str, *args) -> str:
         """Get the true or expected output."""
         raise NotImplementedError
@@ -61,7 +61,7 @@ class TestManager(metaclass=abc.ABCMeta):
         actual_path = osp.join(self.test_dir_path, f'{base}.actual')
         
         queried_truth = False
-        if not osp.isfile(test_path) or self.force_query:
+        if not osp.isfile(test_path) or osp.getmtime(test_path) > osp.getmtime(truth_path):
             true_output = self.get_true_output(test_i, test_name, test_path)
             queried_truth = True
         else:

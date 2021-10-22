@@ -15,11 +15,7 @@ from typing import BinaryIO
 from bs4 import BeautifulSoup
 
 from core import utils
-
-
-# constants and settings
-ORACLE_URL_BASE = 'https://compilers.cool/oracles/o{version}/'
-LANGUAGE = 'cshanty'
+import settings
 
 
 class DivinerBase(utils.TestManager):
@@ -27,11 +23,10 @@ class DivinerBase(utils.TestManager):
                 oracle_version: int,
                 compiler_path: str,
                 test_dir_path: str,
-                force_query: bool = False,
             ) -> None:
-        super().__init__(test_dir_path, LANGUAGE, force_query = force_query)
+        super().__init__(test_dir_path, settings.LANGUAGE)
         self.oracle_version = oracle_version
-        self.oracle_url = ORACLE_URL_BASE.format(version=oracle_version)
+        self.oracle_url = settings.ORACLE_URL_BASE.format(version=oracle_version)
         self.compiler_path = compiler_path
         self.requests_made = 0
     
