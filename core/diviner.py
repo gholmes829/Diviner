@@ -59,7 +59,7 @@ class DivinerBase(utils.TestManager):
         print(f'Consulting with The Oracle at "{self.oracle_url}" and evaluating on local compiler...')
         
     def print_post_info(self):
-        print(f'\nSkipping {self.n_tests - self.requests_made} previously evaluated queries.')
+        print(f'\nUsing {self.n_tests - self.requests_made} previously cached truth queries.')
 
     def title(self) -> str:
         return utils.make_title(f'THE DIVINER (P{self.oracle_version})')

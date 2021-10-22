@@ -61,7 +61,7 @@ class TestManager(metaclass=ABCMeta):
         actual_path = osp.join(self.test_dir_path, f'{base}.actual')
         
         queried_truth = False
-        if not osp.isfile(test_path) or osp.getmtime(test_path) > osp.getmtime(truth_path):
+        if not osp.isfile(truth_path) or osp.getmtime(test_path) > osp.getmtime(truth_path):
             true_output = self.get_true_output(test_i, test_name, test_path)
             queried_truth = True
         else:
