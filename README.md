@@ -30,4 +30,4 @@ More spefically this program:
     
 ## Notes:
 * Results are cached by saving the *\*.truth* and *\*.actual* files in the test_dir. This has the added benefit of being able to see the differences and applying other tools like diff.
-* Currently, only type analysis version for P5 is developed (diviner version = d5). However, feel free to fork and add new version `d[1-8]` in `versions/`. If you inherit from `core/diviner.py/DivinerBase` it should be very trivial to do other versions. 
+* Currently, only type analysis version for P5 is developed (diviner version = d5). However, feel free to fork and add new version `d[1-8]` in `versions/`. If you inherit from `core.diviner.DivinerBase` it should be very trivial to do other versions. 
