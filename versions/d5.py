@@ -17,10 +17,11 @@ import os.path as osp, os
 import argparse
 import re
 
-from core import diviner, utils
+from core.diviner import DivinerBase
+from core import utils
 
 
-class Diviner(diviner.DivinerBase):
+class Diviner(DivinerBase):
     def __init__(self, compiler_path: str, test_dir_path: str, force_query: bool = False) -> None:
         super().__init__(5, compiler_path, test_dir_path, force_query = force_query)
         self.rm_ptn = re.compile(r' \[[0-9]+,[0-9]+\]\-\[[0-9]+,[0-9]+\]: ')

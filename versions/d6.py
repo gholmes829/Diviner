@@ -16,13 +16,15 @@ sys.path.append('..')
 import os.path as osp, os
 import argparse
 
-from core import diviner, utils
+from core.diviner import DivinerBase
+from core import utils
 
 
-class Diviner(diviner.DivinerBase):
+class Diviner(DivinerBase):
     def __init__(self, compiler_path: str, test_dir_path: str, force_query: bool = False) -> None:
         super().__init__(6, compiler_path, test_dir_path, force_query = force_query)
-
+        raise NotImplementedError
+    
 
 def make_subparser(subparsers) -> argparse.Namespace:
     """Defines and parses cmd line args."""
@@ -63,6 +65,7 @@ def main(args) -> None:
         diviner.run_tests()
     
     print(f'Program took {round(t.elapsed, 2)} secs to complete.\n')
+
 
 if __name__ == '__main__':
     main()
