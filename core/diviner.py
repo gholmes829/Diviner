@@ -15,10 +15,11 @@ from typing import BinaryIO
 from bs4 import BeautifulSoup
 
 from core import utils
+from core.utils import TestManager
 import settings
 
 
-class DivinerBase(utils.TestManager):
+class DivinerBase(TestManager):
     def __init__(self,
                 oracle_version: int,
                 compiler_path: str,
@@ -34,7 +35,6 @@ class DivinerBase(utils.TestManager):
         self.requests_made += 1
         return self.scrape_oracle(open(test_path, 'rb'))
 
-        
     def run_compiler(self, *args) -> str:
         try:
             return subprocess.run(
