@@ -9,7 +9,7 @@ See README.md for in depth details.
 __author__ = 'Grant Holmes'
 __email__ = 'g.holmes429@gmail.com'
 __created__ = '10/21/2021'
-__modified__ = '10/21/2021'
+__modified__ = '11/3/2021'
 
 
 import sys
@@ -24,7 +24,22 @@ from core import utils
 class Diviner(DivinerBase):
     def __init__(self, compiler_path: str, test_dir_path: str) -> None:
         super().__init__(6, compiler_path, test_dir_path)
-        raise NotImplementedError
+
+    def get_actual_output(self, test_i: int, test_name: str, test_path: str, out_path: str) -> str:
+        """Compare true and actual output to determine if they match."""
+        res = self.run_compiler(test_path, '-a', out_path)
+        if 'Error' in res:
+            return None  # failed
+        with open(out_path, 'r') as f:
+            return f.read()
+
+    def compare_outputs(self, true_output: str, actual_output: str) -> bool:
+        """Determines if outputs should be considered equal."""
+        return true_output == actual_output
+
+    def get_test_cb_args(self) -> list:
+        """Extra args passed to get_actual_output and get_true_output."""
+        return [[test_path.replace('.cshanty', '.out') for test_path in self.test_file_paths]]
     
 
 def make_subparser(subparsers) -> argparse.Namespace:

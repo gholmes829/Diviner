@@ -54,26 +54,30 @@ class TestManager(metaclass=ABCMeta):
         """Extra args passed to get_actual_output and get_true_output."""
         return []
     
-    def run_test(self, passed_map: dict, test_i: int, test_name: str, test_path: str, write_to_file: bool = True) -> int:
+    def run_test(self, passed_map: dict, test_i: int, test_name: str, test_path: str, *args, write_to_file: bool = True) -> int:
         """Gets the actual and true output, compares them, and writes to files."""
         base = test_name.split(".")[0]
         truth_path = osp.join(self.test_dir_path, f'{base}.truth')
         actual_path = osp.join(self.test_dir_path, f'{base}.actual')
         
-        queried_truth = False
         if not osp.isfile(truth_path) or osp.getmtime(test_path) > osp.getmtime(truth_path):
             true_output = self.get_true_output(test_i, test_name, test_path)
-            queried_truth = True
+            if write_to_file:
+                with open(truth_path, 'w') as f:
+                    f.write(true_output)
         else:
-            true_output = ''
-        actual_output = self.get_actual_output(test_i, test_name, test_path)
+            with open(truth_path, 'r') as f:
+                true_output = f.read()
+
+        actual_output = self.get_actual_output(test_i, test_name, test_path, *args)
         if true_output is None or actual_output is None:
+            passed_map[False].append(test_name)
+            self.pbar.update(1)
             return 0  # failed
         else:
-            with open(actual_path, 'w') as f1, open(truth_path, 'w' if queried_truth else 'r') as f2:
-                if write_to_file: f1.write(actual_output)
-                if queried_truth and write_to_file: f2.write(true_output)
-                elif not queried_truth: true_output = f2.read()
+            if write_to_file:
+                with open(actual_path, 'w') as f:
+                    f.write(actual_output)
                 
             passed = self.compare_outputs(true_output, actual_output)
             passed_map[passed].append(test_name)
@@ -89,8 +93,9 @@ class TestManager(metaclass=ABCMeta):
             exit_codes = threaded_map(lambda params: self.run_test(passed_map, *params), params)
 
         try: _ = list(exit_codes)  # this essentially "gets" the async results which may raise error
-        except Exception:
+        except Exception as e:
             self.pbar.close()
+            print(e)
             fatal_error('exception occurred while evaluating tests.')
         else:
             self.print_test_results(passed_map[0], passed_map[1], t.elapsed)
