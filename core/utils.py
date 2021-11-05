@@ -62,10 +62,10 @@ class TestManager(metaclass=ABCMeta):
         
         if not osp.isfile(truth_path) or osp.getmtime(test_path) > osp.getmtime(truth_path):
             true_output = self.get_true_output(test_i, test_name, test_path)
-            if write_to_file:
+            if true_output and write_to_file:
                 with open(truth_path, 'w') as f:
                     f.write(true_output)
-        else:
+        else:  # no need to search for truth
             with open(truth_path, 'r') as f:
                 true_output = f.read()
 
