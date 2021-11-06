@@ -22,20 +22,38 @@ from core import utils
 
 
 class Diviner(DivinerBase):
+    truth_subs = [
+        ('AND8', 'AND64'),
+        ('OR8', 'OR64'),
+        ('NOT8', 'NOT64'),
+    ]
+
+    actual_subs = [
+        ('tmpVar', 'tmp'),
+    ]
+
     def __init__(self, compiler_path: str, test_dir_path: str) -> None:
         super().__init__(6, compiler_path, test_dir_path)
 
     def get_actual_output(self, test_i: int, test_name: str, test_path: str, out_path: str) -> str:
         """Compare true and actual output to determine if they match."""
         res = self.run_compiler(test_path, '-a', out_path)
-        if 'Error' in res:
+        if not osp.isfile(out_path) or 'Error' in res:
             return None  # failed
         with open(out_path, 'r') as f:
             return f.read()
 
     def compare_outputs(self, true_output: str, actual_output: str) -> bool:
         """Determines if outputs should be considered equal."""
-        return true_output == actual_output
+        for true_ln, actual_ln in zip():
+            for sub in Diviner.truth_subs:
+                true_ln = true_ln.replace(*sub)
+            for sub in Diviner.actual_subs:
+                actual_ln = actual_ln.replace(*sub)
+            if true_ln != actual_ln:
+                return False
+        return True
+            
 
     def get_test_cb_args(self) -> list:
         """Extra args passed to get_actual_output and get_true_output."""
