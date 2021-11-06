@@ -45,7 +45,10 @@ class Diviner(DivinerBase):
 
     def compare_outputs(self, true_output: str, actual_output: str) -> bool:
         """Determines if outputs should be considered equal."""
-        for true_ln, actual_ln in zip():
+        true_lns, actual_lns = true_output.split('\n'), actual_output.split('\n')
+        if len(true_lns) != len(actual_lns):
+            return False
+        for true_ln, actual_ln in zip(true_lns, actual_lns):
             for sub in Diviner.truth_subs:
                 true_ln = true_ln.replace(*sub)
             for sub in Diviner.actual_subs:
