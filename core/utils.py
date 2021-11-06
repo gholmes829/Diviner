@@ -71,23 +71,23 @@ class TestManager(metaclass=ABCMeta):
 
         actual_output = self.get_actual_output(test_i, test_name, test_path, *args)
         if true_output is None or actual_output is None:
-            passed_map[False].append(test_name)
+            passed_map['null'].append(test_name)
             self.pbar.update(1)
-            return 0  # failed
+            return 0  # failed to generate
         else:
             if write_to_file:
                 with open(actual_path, 'w') as f:
                     f.write(actual_output)
                 
-            passed = self.compare_outputs(true_output, actual_output)
+            passed = 'passed' * self.compare_outputs(true_output, actual_output) or 'failed'
             passed_map[passed].append(test_name)
             self.pbar.update(1)
-            return 1  # success
+            return 1  # successful evaluation
 
     def run_tests(self) -> None:
         """Use multithreading to run all tests then display results."""
         self.print_pre_info()
-        passed_map = {False: [], True: []}
+        passed_map = {'failed': [], 'passed': [], 'null': []}
         params = list(zip(*reduce(lambda b, a: b + [a], self.get_test_cb_args(), self.test_data)))
         with Timer() as t, tqdm(total=self.n_tests, ascii=True) as self.pbar:
             exit_codes = threaded_map(lambda params: self.run_test(passed_map, *params), params)
@@ -98,12 +98,13 @@ class TestManager(metaclass=ABCMeta):
             print(e)
             fatal_error('exception occurred while evaluating tests.')
         else:
-            self.print_test_results(passed_map[0], passed_map[1], t.elapsed)
+            self.print_test_results(passed_map['failed'], passed_map['passed'], passed_map['null'], t.elapsed)
         
-    def print_test_results(self, failed_cases: list, passed_cases: list, elapsed: float) -> None:
+    def print_test_results(self, failed_cases: list, passed_cases: list, null_cases: list, elapsed: float) -> None:
         percent_passed = 100 * len(passed_cases) / self.n_tests
         self.print_cases('passed', passed_cases)
         self.print_cases('failed', failed_cases)
+        self.print_cases('null', null_cases)
         self.print_post_info()
         print(f'\n\nWrote *.truth and *.actual files to "{self.test_dir_path}".\n')
         self.print_final(passed_cases, elapsed, percent_passed)
