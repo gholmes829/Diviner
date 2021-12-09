@@ -6,25 +6,27 @@ import sys
 import os.path as osp, os
 from typing import Callable, Iterable, Iterator
 import time
+import re
 from abc import ABCMeta, abstractmethod 
 from tqdm import tqdm
+import subprocess
 from functools import wraps, reduce
 from concurrent.futures import ThreadPoolExecutor
 
 
 __author__ = 'Grant Holmes'
 __email__ = 'g.holmes429@gmail.com'
-__created__ = '10/19/2021'
-__modified__ = '10/21/2021'
 
 
 class TestManager(metaclass=ABCMeta):
-    """
-    Abstracted test manager. Must implement required abstract methods for particular use case.
-    """
+    """Abstracted test manager. Must implement required abstract methods for particular use case."""
     def __init__(self, test_dir_path: str, test_ext: str) -> None:
+        assert osp.exists(test_dir_path)
+        assert re.fullmatch(r'[\w]+', test_ext)
+
         self.test_dir_path = test_dir_path
         self.test_ext = test_ext
+        
         self.test_file_names = [f for f in os.listdir(test_dir_path) if f.split('.')[-1] == test_ext]
         self.n_tests = len(self.test_file_names)
         if not self.n_tests:
@@ -135,9 +137,19 @@ class Timer:
 
     def __exit__(self, *args):
         self.elapsed = time.time() - self._timer
-        
-        
-class ConnError(Exception): pass
+
+
+def execute_in_shell(cmd: str, cwd = None) -> str:
+    try:
+        return subprocess.run(
+            cmd,
+            cwd = cwd,
+            shell=True,
+            stdout = subprocess.PIPE,
+            stderr = subprocess.STDOUT,
+        ).stdout.decode(encoding='utf-8')
+    except Exception as err:
+        fatal_error(f'unable to run compiler "{err}".')
 
 
 def threaded_map(fn: Callable, data: Iterable, max_workers: int = None) -> Iterator:

@@ -9,7 +9,7 @@ __modified__ = '10/21/2021'
 
 import os.path as osp
 import requests
-import subprocess
+
 from typing import BinaryIO
 
 from bs4 import BeautifulSoup
@@ -36,24 +36,17 @@ class DivinerBase(TestManager):
         return self.scrape_oracle(open(test_path, 'rb'))
 
     def run_compiler(self, *args) -> str:
-        try:
-            return subprocess.run(
-                [f'./{osp.basename(self.compiler_path)}'] + list(args),
-                cwd = osp.dirname(self.compiler_path),
-                stdout = subprocess.PIPE,
-                stderr = subprocess.STDOUT,
-            ).stdout.decode(encoding='utf-8')
-        except Exception as err:
-            utils.fatal_error(f'unable to run compiler "{err}".')
+        utils.execute_in_shell(
+            f'./{osp.basename(self.compiler_path)}' + ''.join(list(args)),
+            cwd = osp.dirname(self.compiler_path)
+        )
     
     @utils.retryable(err_msg='could not connect to oracle', verbose = False)
     def scrape_oracle(self, test_file: BinaryIO) -> str:
         """Queries the oracle with a given test case and returns output."""
         res = requests.post(self.oracle_url, files={'input': test_file})
-        if res.status_code == 200:
-            return BeautifulSoup(res.text, 'html.parser').find('pre').text
-        else:
-            raise utils.ConnError()
+        if res.status_code == 200: return BeautifulSoup(res.text, 'html.parser').find('pre').text
+        else: raise utils.ConnError()
         
     def print_pre_info(self):
         print(f'Consulting with The Oracle at "{self.oracle_url}" and evaluating on local compiler...')
