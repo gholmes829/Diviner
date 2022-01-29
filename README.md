@@ -11,7 +11,7 @@ More spefically this program:
 
 ## Example usage:
 * `python3 Diviner D5 cshanty p5_files/cshantyc p5_files/tests`
-* `python3 Diviner D3 cmm p5_files/cmmc p3_files/tests --no_file_gen`
+* `python3 Diviner D3 cmm p3_files/cmmc p3_files/tests --no_file_gen`
 * `python3 Diviner D6 -h`
     
 ...where `tests/` might contain `test1.lang`, `test2.lang`, etc. `--no_file_gen` flag disables the Diviner from saving *(\*.truth, \*.actual)* as files.
