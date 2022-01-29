@@ -1,5 +1,5 @@
 """
-
+Entry point, gathers arguments, constructs correct Diviner version, then initiates testing.
 """
 
 __author__ = 'Grant Holmes'
@@ -25,7 +25,8 @@ def main():
 	args = make_argparser().parse_args()
 	version: str = args.diviner_version
 	language_ext: str = args.language_ext
-	if language_ext.startswith('.'): language_ext = language_ext[1:]
+	if language_ext.startswith('.'):
+		language_ext = language_ext[1:]
 	compiler_path: str = args.compiler_path
 	test_dir_path: str = args.test_dir_path
 	write_to_file: bool = not args.no_file_gen

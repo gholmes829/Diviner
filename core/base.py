@@ -9,7 +9,7 @@ __email__ = 'g.holmes429@gmail.com'
 from abc import ABCMeta, abstractmethod
 import os.path as osp, os
 import requests
-from typing import BinaryIO
+from typing import BinaryIO, List
 from bs4 import BeautifulSoup
 from functools import reduce
 from pipe import where, select
@@ -17,7 +17,6 @@ from tqdm.contrib.concurrent import thread_map
 
 from core import utils
 
-# TODO check for cached compiler output
 
 class DivinerBase(metaclass = ABCMeta):
     version = None
@@ -32,21 +31,20 @@ class DivinerBase(metaclass = ABCMeta):
                 language_ext: str,
                 compiler_path: str,
                 test_dir_path: str,
-                write_to_file: bool = True,
+                write_to_file: bool = True,  # determines whether (*.actual, *.truth) pairs saved as files
             ) -> None:
         # path validation
-        if not osp.isdir(osp.join(os.getcwd(), test_dir_path)):
+        self.compiler_path = osp.join(os.getcwd(), compiler_path)
+        self.test_dir_path = osp.join(os.getcwd(), test_dir_path)
+        if not osp.isdir(self.test_dir_path):
             utils.fatal_error(f'<test_dir_path>, "{test_dir_path}", is not a directory')
-        if not osp.isfile(osp.join(os.getcwd(), compiler_path)):
+        if not osp.isfile(self.compiler_path):
             utils.fatal_error(f'<compiler_path>, "{compiler_path}", is not a file')
         
-        # store args
+        # store other args
         self.oracle_url = f'https://compilers.cool/oracles/o{self.version}/'
         self.title_str = utils.make_title(f'THE DIVINER (P{self.version})')
         self.language_ext = language_ext
-
-        self.compiler_path = compiler_path
-        self.test_dir_path = test_dir_path
 
         self.write_to_file = write_to_file
 
@@ -71,26 +69,26 @@ class DivinerBase(metaclass = ABCMeta):
 
 
     @abstractmethod
-    def compare_outputs(self, true_output: str, actual_output: str, *args) -> bool:
-        """Compare true and actual output to determine if they match."""
-        raise NotImplementedError
-    
-
-    @abstractmethod
     def get_actual_output(self, test_i: int, test_name: str, test_path: str, *args) -> str:
-        """Get the real output that will be compared to the expected output."""
+        """Get the real output that will be compared to the expected output. Version dependent."""
         raise NotImplementedError
-    
+
 
     def get_true_output(self, test_i: int, test_name: str, test_path: str) -> str:
         self.oracle_requests_count += 1
         with open(test_path, 'rb') as f:
-            return self.parse_oracle(self.scrape_oracle(f))
+            return self.process_oracle_output(self.scrape_oracle(f))
+
+    
+    def compare_outputs(self, true_output: str, actual_output: str) -> bool:
+        """Compare true and actual output to determine if they match."""
+        return true_output == actual_output
 
 
     def get_test_cb_args(self) -> list:
         """Extra args passed to get_actual_output and get_true_output."""
         return None
+
 
     def title(self):
         return self.title_str
@@ -108,11 +106,12 @@ class DivinerBase(metaclass = ABCMeta):
     def scrape_oracle(self, test_file: BinaryIO) -> str:
         """Queries the oracle with a given test case and returns output."""
         res = requests.post(self.oracle_url, files={'input': test_file})
-        if res.status_code == 200: return BeautifulSoup(res.text, 'html.parser')
+        if res.status_code == 200: return BeautifulSoup(res.text, 'html.parser').find_all('pre')
         else: raise ConnectionError
 
-    def parse_oracle(self, soup):
-        return soup.find('pre').text
+
+    def process_oracle_output(self, output: List[str]):
+        return '\n'.join(p.text for p in output)
 
 
     def run_test(self, passed_map: dict, test_i: int, test_name: str, test_path: str, *args) -> int:

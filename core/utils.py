@@ -7,7 +7,7 @@ __email__ = 'g.holmes429@gmail.com'
 
 
 import sys
-from typing import Callable, Iterable, Iterator
+from typing import Callable, Iterable
 import time
 import subprocess
 from functools import wraps
@@ -24,8 +24,7 @@ class Timer:
     def elapsed(self):
         return self.finish or time.time() - self.start
 
-
-    def __exit__(self, *args):
+    def __exit__(self, *_):
         self.finish = time.time() - self.start
 
 
@@ -46,7 +45,7 @@ def retryable(
             f: Callable = None,
             *,
             max_tries: int = 1,
-            wait_time: Callable = (lambda t: 0.1),
+            wait_time: Callable = (lambda _: 0.1),
             err_msg: str = None,
             verbose: bool = True
         ) -> Callable:
@@ -55,18 +54,15 @@ def retryable(
         def wrapper(*args,**kwargs):
             err = None
             for try_i in range(max_tries + 1):
-                try:
-                    return g(*args, **kwargs)
-                except Exception as e:
-                    err = e
-                    if verbose: warning(err_msg or f'exhausted retries when attempting to run "{f.__name__}"' + ' -- trying again')
+                try: return g(*args, **kwargs)
+                except Exception as err:
+                    if verbose: warning(err_msg or f'exhausted retries when attempting to run {f}' + ' -- trying again')
                     time.sleep(wait_time(try_i))
-            if verbose: warning(err_msg or f'exhausted retries when attempting to run "{f.__name__}"')
+            if verbose: warning(err_msg or f'exhausted retries when attempting to run {f}')
             raise err
         return wrapper
 
-    if f: return decorator(f)
-    else: return decorator
+    return decorator(f) if f else decorator
     
     
 def count(data: Iterable) -> dict:

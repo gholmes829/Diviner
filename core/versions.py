@@ -10,7 +10,6 @@ __email__ = 'g.holmes429@gmail.com'
 
 
 import os.path as osp, os
-from pipe import select
 import re
 
 from core.base import DivinerBase
@@ -18,7 +17,7 @@ from core import utils
 
 
 def versions():
-    return list(sorted(DivinerBase.version_registry.values(), key = lambda cls: cls.version) | select(lambda cls: cls.__name__))
+    return [cls.__name__ for cls in sorted(DivinerBase.version_registry.values(), key = lambda cls: cls.version)]
 
 
 def make_diviner(version, *args, **kwargs):
@@ -39,22 +38,12 @@ class D1(DivinerBase):
         with open(token_path, 'r') as token_f, open(error_path, 'r') as error_f:
             return token_f.read() + error_f.read()
 
-    def compare_outputs(self, true_output: str, actual_output: str) -> bool:
-        return true_output == actual_output
-
-    def parse_oracle(self, soup):
-        if '(no error output)' in soup.text:
-            tokens, errors = soup.find('pre').text, ''
-        else:
-            tokens, errors = tuple(soup.find_all('pre') | select(lambda match: match.text))
-        return tokens + errors
-
     def get_test_cb_args(self) -> list:
         """Extra args passed to get_actual_output and get_true_output."""
-        return [
+        return (
             [test_path.replace(f'.{self.language_ext}', '_tokens.txt') for test_path in self.test_file_paths],
             [test_path.replace(f'.{self.language_ext}', '_errors.txt') for test_path in self.test_file_paths]
-        ]
+        )
 
 
 class D2(DivinerBase):
@@ -65,7 +54,8 @@ class D2(DivinerBase):
 
     def get_actual_output(self, test_i: int, test_name: str, test_path: str) -> str:
         """Compare true and actual output to determine if they match."""
-        res = self.run_compiler(test_path, '-u')
+        res = self.run_compiler(test_path, '-p')
+        raise NotImplementedError
 
     def compare_outputs(self, true_output: str, actual_output: str) -> bool:
         raise NotImplementedError
@@ -89,14 +79,12 @@ class D3(DivinerBase):
         with open(unparse_path, 'r') as unparse_f:
             return unparse_f.read()
 
-    def compare_outputs(self, true_output: str, actual_output: str) -> bool:
-        return true_output == actual_output
-
     def get_test_cb_args(self) -> list:
         """Extra args passed to get_actual_output and get_true_output."""
-        return [
+        return (
             [test_path.replace(f'.{self.language_ext}', 'unparsed.out') for test_path in self.test_file_paths],
-        ]
+            # more?
+        )
 
 
 class D4(DivinerBase):
@@ -129,8 +117,8 @@ class D5(DivinerBase):
         return self.run_compiler(test_path, '-c')
     
     def compare_outputs(self, true_output: str, actual_output: str) -> bool:
-        """Determines if outputs should be considered equal. Note, that we
-        are no longer required to match pos or order -- just error type."""
+        """Determines if outputs should be considered equal. Note,
+           this just matches error type and not match pos or order."""
         actual_count = utils.count(map(lambda ln: re.sub(self.rm_ptn, ' ', ln), actual_output.split('\n')))
         truth_count = utils.count(map(lambda ln: re.sub(self.rm_ptn, ' ', ln), true_output.split('\n')))
         return actual_count == truth_count
@@ -177,7 +165,7 @@ class D6(DivinerBase):
 
     def get_test_cb_args(self) -> list:
         """Extra args passed to get_actual_output and get_true_output."""
-        return [[test_path.replace(f'.{self.language_ext}', '.out') for test_path in self.test_file_paths]]
+        return ([test_path.replace(f'.{self.language_ext}', '.out') for test_path in self.test_file_paths],)
 
 
 class D7(DivinerBase):
