@@ -19,12 +19,11 @@ More spefically this program:
 ...where `my_tests/` might contain test1.lang, test2.lang, etc.
     
 ## Dependencies:
-* python3 (https://www.python.org/downloads/)
-* bs4 `pip3 install bs4`
-* tqdm `pip3 install tqdm`
+* Python 3 (https://www.python.org/downloads/)
+* several libraries, see below for installation
 * ...the rest should be standard.
 
-* You can also (alternatively) run `make install` or `pip3 install -r requirements.txt` for convenience
+* You should run `make install` or `pip3 install -r requirements.txt` to grab Python dependencies
 * While we are on the topic of make directives, `make clean` removes all compiled `*.pyc` files
     
     
