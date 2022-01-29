@@ -28,3 +28,6 @@ More spefically this program:
 ## Notes:
 * Results are cached by default by saving the *\*.truth* and *\*.actual* files in the test_dir. This has the added benefit of being able to see the differences and applying other tools like diff.
 * Several diviner versions may be missing. However, feel free to fork, add new version `d[1-8]` in `core/versions.py`, and submit a PR. If you inherit from `core.diviner_base.DivinerBase` and take a look at the other versions, it shouldn't be too hard.
+
+## License
+This project is licensed under the MIT License - see the LICENSE file for details.
