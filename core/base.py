@@ -84,7 +84,8 @@ class DivinerBase(metaclass = ABCMeta):
 
     def get_true_output(self, test_i: int, test_name: str, test_path: str) -> str:
         self.oracle_requests_count += 1
-        return self.scrape_oracle(open(test_path, 'rb'))
+        with open(test_path, 'rb') as f:
+            return self.parse_oracle(self.scrape_oracle(f))
 
 
     def get_test_cb_args(self) -> list:
@@ -107,8 +108,11 @@ class DivinerBase(metaclass = ABCMeta):
     def scrape_oracle(self, test_file: BinaryIO) -> str:
         """Queries the oracle with a given test case and returns output."""
         res = requests.post(self.oracle_url, files={'input': test_file})
-        if res.status_code == 200: return BeautifulSoup(res.text, 'html.parser').find('pre').text
+        if res.status_code == 200: return BeautifulSoup(res.text, 'html.parser')
         else: raise ConnectionError
+
+    def parse_oracle(self, soup):
+        return soup.find('pre').text
 
 
     def run_test(self, passed_map: dict, test_i: int, test_name: str, test_path: str, *args) -> int:

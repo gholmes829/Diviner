@@ -11,10 +11,6 @@ __email__ = 'g.holmes429@gmail.com'
 
 import os.path as osp, os
 from pipe import select
-import requests
-from typing import BinaryIO
-from typing import BinaryIO
-from bs4 import BeautifulSoup
 import re
 
 from core.base import DivinerBase
@@ -46,19 +42,12 @@ class D1(DivinerBase):
     def compare_outputs(self, true_output: str, actual_output: str) -> bool:
         return true_output == actual_output
 
-    @utils.retryable(err_msg='could not connect to oracle', verbose = False)
-    def scrape_oracle(self, test_file: BinaryIO) -> str:
-        """Queries the oracle with a given test case and returns output."""
-        res = requests.post(self.oracle_url, files={'input': test_file})
-        if res.status_code == 200:
-            soup = BeautifulSoup(res.text, 'html.parser')
-            if '(no error output)' in soup.text:
-                tokens = soup.find('pre').text
-                errors = ''
-            else:
-                tokens, errors = tuple(soup.find_all('pre') | select(lambda match: match.text))
-            return tokens + errors
-        else: raise ConnectionError
+    def parse_oracle(self, soup):
+        if '(no error output)' in soup.text:
+            tokens, errors = soup.find('pre').text, ''
+        else:
+            tokens, errors = tuple(soup.find_all('pre') | select(lambda match: match.text))
+        return tokens + errors
 
     def get_test_cb_args(self) -> list:
         """Extra args passed to get_actual_output and get_true_output."""
@@ -66,6 +55,66 @@ class D1(DivinerBase):
             [test_path.replace(f'.{self.language_ext}', '_tokens.txt') for test_path in self.test_file_paths],
             [test_path.replace(f'.{self.language_ext}', '_errors.txt') for test_path in self.test_file_paths]
         ]
+
+
+class D2(DivinerBase):
+    version = 2
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+    def get_actual_output(self, test_i: int, test_name: str, test_path: str) -> str:
+        """Compare true and actual output to determine if they match."""
+        res = self.run_compiler(test_path, '-u')
+
+    def compare_outputs(self, true_output: str, actual_output: str) -> bool:
+        raise NotImplementedError
+
+    def get_test_cb_args(self) -> list:
+        """Extra args passed to get_actual_output and get_true_output."""
+        raise NotImplementedError
+
+
+class D3(DivinerBase):
+    version = 3
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+    def get_actual_output(self, test_i: int, test_name: str, test_path: str, unparse_path: str) -> str:
+        """Compare true and actual output to determine if they match."""
+        res = self.run_compiler(test_path, '-u', unparse_path)
+        if not osp.isfile(unparse_path) or res and 'Error' in res:
+            return None  # failed
+        with open(unparse_path, 'r') as unparse_f:
+            return unparse_f.read()
+
+    def compare_outputs(self, true_output: str, actual_output: str) -> bool:
+        return true_output == actual_output
+
+    def get_test_cb_args(self) -> list:
+        """Extra args passed to get_actual_output and get_true_output."""
+        return [
+            [test_path.replace(f'.{self.language_ext}', 'unparsed.out') for test_path in self.test_file_paths],
+        ]
+
+
+class D4(DivinerBase):
+    version = 4
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+    def get_actual_output(self, test_i: int, test_name: str, test_path: str) -> str:
+        """Compare true and actual output to determine if they match."""
+        raise NotImplementedError
+
+    def compare_outputs(self, true_output: str, actual_output: str) -> bool:
+        raise NotImplementedError
+
+    def get_test_cb_args(self) -> list:
+        """Extra args passed to get_actual_output and get_true_output."""
+        raise NotImplementedError
 
 
 class D5(DivinerBase):
@@ -129,3 +178,39 @@ class D6(DivinerBase):
     def get_test_cb_args(self) -> list:
         """Extra args passed to get_actual_output and get_true_output."""
         return [[test_path.replace(f'.{self.language_ext}', '.out') for test_path in self.test_file_paths]]
+
+
+class D7(DivinerBase):
+    version = 7
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+    def get_actual_output(self, test_i: int, test_name: str, test_path: str) -> str:
+        """Compare true and actual output to determine if they match."""
+        raise NotImplementedError
+
+    def compare_outputs(self, true_output: str, actual_output: str) -> bool:
+        raise NotImplementedError
+
+    def get_test_cb_args(self) -> list:
+        """Extra args passed to get_actual_output and get_true_output."""
+        raise NotImplementedError
+
+
+class D8(DivinerBase):
+    version = 8
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+    def get_actual_output(self, test_i: int, test_name: str, test_path: str) -> str:
+        """Compare true and actual output to determine if they match."""
+        raise NotImplementedError
+
+    def compare_outputs(self, true_output: str, actual_output: str) -> bool:
+        raise NotImplementedError
+
+    def get_test_cb_args(self) -> list:
+        """Extra args passed to get_actual_output and get_true_output."""
+        raise NotImplementedError
